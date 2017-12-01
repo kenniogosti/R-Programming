@@ -1,0 +1,122 @@
+rm(list = ls()) #clear environment
+graphics.off() #close all graphics
+
+# Simulation
+# Suppose you play cards with friends. You have a deck of 52 cards with 
+# 13 ranks and 4 suits (clubs, diamonds, spades, and hearts). Think of the 
+# deck as a typical poker deck. Suppose you are 6 players and each is dealt 
+# 5 cards. Find by means of a simulation (i.e., dealing cards, for 100, 
+# 1′000, 10′000 times) the following (approximate) probabilities:
+#
+#   1. The probability that any two players are dealt a “four of a kind”.
+#   2. Player 1 is dealt a “straight flush” (a straight flush is a hand 
+#      consisting of any five subsequent cards of a single suit)
+# 
+# Note: The probabilities might be quite small. In order to have a 
+# reasonable brute-force simulation estimate you may need to run the 
+# simulation with may replications. Make sure to first fix the basic 
+# simulation func- tionality. Should you find your simulation to be to slow 
+# for large n start improving your code. Grading will be 70% on functional 
+# code and 30% on practicatiliby of large simulations.
+
+#   1. The probability that any two players are dealt a “four of a kind”. ####
+
+# Generate poker deck, focus on ranks ####
+ranks <- c(2:10, "J", "Q", "K", "A")
+pokerdeck<- rep(ranks, 4)
+
+pokerdeck
+
+# No of simulations
+nSim1 <- 10^2
+nSim2 <- 10^3
+nSim3 <- 10^4
+
+# Create matrix to contain all simulated decks, where the first player's cards will be [,1:5], second player's [,6:10] and so on
+randomDecks <- matrix(NA, nSim1, 52)
+
+randomDecks
+
+
+# Simulate the cards dealt to the players based on the number of simulations ####
+# create function? to apply to the simulations?
+for (i in 1:nSim1) {
+  randomDecks[i,] <- sample(pokerdeck, size = 52, replace = F)
+}
+
+randomDecks
+
+# Create function to check if each player has four of a kind ####
+# Explain!!!
+checkFour <- function(deck) {
+  
+  # Check for Player 1
+  if(all(sort(summary(as.factor(deck[1:5]))) == c(1,4))){    
+    P1 <- T
+  } else {
+    P1 <- F
+  }
+  
+  # Check for Player 2
+  if(all(sort(summary(as.factor(deck[6:10]))) == c(1,4))){   
+    P2 <- T
+  } else {
+    P2 <- F
+  }
+  
+  # Check for Player 3
+  if(all(sort(summary(as.factor(deck[11:15]))) == c(1,4))){   
+    P3 <- T
+  } else {
+    P3 <- F
+  }
+  
+  # Check for Player 4
+  if(all(sort(summary(as.factor(deck[16:20]))) == c(1,4))){  
+    P4 <- T
+  } else {
+    P4 <- F
+  }
+  
+  # Check for Player 5
+  if(all(sort(summary(as.factor(deck[21:25]))) == c(1,4))){  
+    P5 <- T
+  } else {
+    P5 <- F
+  }
+  
+  # Check for Player 6
+  if(all(sort(summary(as.factor(deck[26:30]))) == c(1,4))){    # to check if there are only 2 suits
+    P6 <- T
+  } else {
+    P6 <- F
+  }
+  
+  # Compile results
+  return(c(P1, P2, P3, P4, P5, P6))
+}
+
+# Apply the function checkFour on the simulated deck ####
+# to find out which players has four of a kind and assign the result into a vector. To make the returned value more understandable, the resulting matrix is transposed so that the resulting logical value corresponds to the logical value for each player in each simulation.
+checked1 <- t(apply(randomDecks, 1, checkFour))
+
+checked1
+
+# Create function to check if any 2 of the 6 players has Four of a Kind ####
+check2P <- function(checked) {
+  if(sum(checked[1:6]) == 2) {
+    D <- T
+  } else {
+    D <- F
+  }
+  return(D)
+}
+
+# Apply the function check2P on the previously checked decks ####
+# and assign the result into another vector
+checked21 <- apply(checked1, 1, check2P)
+
+
+# Calculate the probability of any 2 players being dealt Four of a Kind for the given simulation ####
+Pr1 <- sum(checked21)/nSim1 #for nSim1 simulations
+Pr1
